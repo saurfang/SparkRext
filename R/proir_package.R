@@ -1,5 +1,37 @@
 #'
 #' @export
+unload_package <- function(pkg_name) {
+  pkg_name <- as.character(substitute(pkg_name))
+  unload_package_(pkg_name)
+}
+
+#'
+#' @export
+unload_package_ <- function(pkg_name) {
+  packages <- Filter(function(x) stringr::str_detect(x, "^package:"), search())
+  packages <- Map(function(x) stringr::str_replace(x, "^package:", ""), packages)
+  packages <- unlist(unname(packages))
+  
+  if(!(pkg_name %in% packages)) {
+    return(pkg_name)
+  }
+  
+  result_packages <- pkg_name
+  while(TRUE) {
+    tryCatch({
+      detach(paste0("package:", pkg_name), character.only = TRUE)
+      break
+    }, error = function(e) {
+      required_package <- stringr::str_match(e$message, pattern = "required by ‘(.+?)’")[1, 2]
+      required_packages <- unload_package(required_package)
+      result_packages <<- c(result_packages, required_packages)
+    })
+  }
+  unique(result_packages)
+}
+
+#'
+#' @export
 prior_package <- function(pkg_name) {
   pkg_name <- as.character(substitute(pkg_name))
   prior_package_(pkg_name)
@@ -8,26 +40,13 @@ prior_package <- function(pkg_name) {
 #'
 #' @export
 #' @rdname prior_package
-prior_package_ <- function(pkg_name) {  
-  default_packages <- c(options("defaultPackages")$defaultPackages, "base")
-  if(pkg_name %in% default_packages) 
-    stop(sporintf("Error. %s is default package.", pkg_name))
-  
-  packages <- Filter(function(x) stringr::str_detect(x, "^package:"), search())
-  packages <- Map(function(x) stringr::str_replace(x, "^package:", ""), packages)
-  packages <- unlist(unname(packages))
-  
-  unload_packages <- Filter(Negate(function(x) x %in% default_packages), packages)
-  
-  for(pkg in unload_packages) {
-    detach(paste0("package:", pkg), character.only = TRUE)
+prior_package_ <- function(pkg_name) {
+  pkg_names <- unload_package_(pkg_name)
+  if(pkg_name == "SparkRext") {
+    unload_package(SparkR)
+    pkg_names <- c("SparkR", pkg_name)
   }
-  
-  ignore_packages <- c(default_packages, pkg_name)
-  load_packages <- rev(Filter(Negate(function(x) x %in% ignore_packages), packages))
-  
-  for(pkg in load_packages) {
-    suppressPackageStartupMessages(library(pkg, character.only = TRUE))
+  for (pkg_name in pkg_names) {
+    suppressPackageStartupMessages(library(pkg_name, character.only = TRUE))
   }
-  suppressPackageStartupMessages(library(pkg_name, character.only = TRUE))
 }

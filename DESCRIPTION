@@ -6,3 +6,12 @@ Date: 2015-06-30
 Author: Koji MAKIYAMA (@hoxo_m)
 Maintainer: Koji MAKIYAMA <hoxo.smile@gmail.com>
 Description: SparkR extension
+Suggests:
+  nycflights13,
+  testthat
+Imports: 
+  dplyr,
+  lazyeval,
+  stringr
+Depends:
+  magrittr
