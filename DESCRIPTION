@@ -1,11 +1,11 @@
 Package: SparkRext
 Type: Package
-Title: SparkR extension
-Version: 0.0.1
-Date: 2015-06-30
+Title: SparkR extension for closer to dplyr
+Version: 0.1.0
+Date: 2015-07-03
 Author: Koji MAKIYAMA (@hoxo_m)
 Maintainer: Koji MAKIYAMA <hoxo.smile@gmail.com>
-Description: SparkR extension
+Description: SparkR extension for closer to the feeling of dplyr.
 Suggests:
   nycflights13,
   testthat
