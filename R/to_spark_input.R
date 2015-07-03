@@ -1,11 +1,27 @@
-to_spark_input <- function(dot, dfname, columns) {
-  expr <- deparse(dot$expr)
-  envir <- dot$env
-  expr <- Reduce(function(prev, colname) {
-    replacement <- sprintf("%s$%s", dfname, colname)
-    tmp <- stringr::str_replace_all(prev, pattern = colname, replacement = replacement)
-    pattern <- sprintf("$%s", dfname)
-    stringr::str_replace_all(tmp, pattern = pattern, replacement = "")
-  }, columns, init = expr)
-  eval(parse(text = expr), envir = envir)
+to_spark_input <- function(lazy, dfname, columns) {
+  expr <- lazy$expr
+  envir <- lazy$env
+  spark_expr <- translate_spark_columns(expr, dfname, columns)
+  eval(spark_expr, envir = envir)
+}
+
+translate_spark_columns <- function(call, dfname, columns) {
+  if(is.atomic(call)) return(call)
+  
+  if(is.symbol(call)) {
+    name <- as.character(call)
+    if(name %in% columns) {
+      parse(text = sprintf("%s$%s", dfname, name))[[1]]
+    } else {
+      call
+    }
+  } else if(is.call(call)) {
+    name <- as.character(call[[1]])
+    if(name %in% c("$", "[[", "[")) {
+      call
+    } else {
+      call[-1] <- lapply(call[-1], translate_spark_columns, dfname, columns)
+      call
+    }
+  }
 }

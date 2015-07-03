@@ -10,6 +10,12 @@
 # data <- sample_n(flights, 10000)
 # df <- createDataFrame(sqlContext, data.frame(data))
 # 
+# on.exit({
+#   message("Stopping Spark...")
+#   sparkR.stop()
+#   message("OK.")
+# })
+# 
 # prior_package(SparkRext)
 # 
 # test_that("one column", {
@@ -77,7 +83,3 @@
 #   act <- Filter(Negate(function(col) col %in% c("year", "month", "day")), columns(result))
 #   expect_equal(columns(result), act)
 # })
-# 
-# message("Stopping Spark...")
-# sparkR.stop()
-# message("OK.")
