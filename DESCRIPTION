@@ -12,6 +12,6 @@ Suggests:
 Imports: 
   dplyr,
   lazyeval,
+  pipeR,
   stringr
-Depends:
-  magrittr
+License: MIT
