@@ -44,6 +44,11 @@ test_that("use variable same name", {
   expect_equal(result, 883)
 })
 
+test_that("with pipe", {
+  result <- df %>% filter(month == 12) %>% count
+  expect_equal(result, 883)
+})
+
 context("select")
 
 test_that("one column", {
@@ -112,6 +117,11 @@ test_that("minus number column sequence", {
   expect_equal(columns(result), act)
 })
 
+test_that("with pipe", {
+  result <- df %>% select(year)
+  expect_equal(columns(result), "year")
+})
+
 context("mutate")
 
 test_that("add one column", {
@@ -122,6 +132,18 @@ test_that("add one column", {
 
 test_that("add two columns", {
   result <- mutate(df, gain = arr_delay - dep_delay, gain_per_hour = gain/(air_time/60))
+  act <- c(columns(df), "gain", "gain_per_hour")
+  expect_equal(SparkR::columns(result), act)
+})
+
+test_that("with pipe", {
+  result <- df %>% mutate(gain = arr_delay - dep_delay)
+  act <- c(columns(df), "gain")
+  expect_equal(SparkR::columns(result), act)
+})
+
+test_that("with pipe2", {
+  result <- df %>% mutate(gain = arr_delay - dep_delay, gain_per_hour = gain/(air_time/60))
   act <- c(columns(df), "gain", "gain_per_hour")
   expect_equal(SparkR::columns(result), act)
 })
@@ -149,6 +171,11 @@ test_that("use other function", {
   expect_equal(result$dep_delay, rep(0, 6))
 })
 
+test_that("with pipe", {
+  result <- df %>% arrange(month) %>% head
+  expect_equal(result$month, rep(1, 6))
+})
+
 context("summarize")
 
 test_that("one column", {
@@ -170,4 +197,44 @@ test_that("first()", {
 test_that("last()", {
   result <- summarize(df, last_distance=last(distance)) %>% collect
   expect_equal(result$last_distance, 1400)
+})
+
+test_that("with pipe", {
+  result <- df %>% summarize(size=n(distance)) %>% collect
+  expect_equal(result$size, 10000)
+})
+
+context("group_by")
+
+test_that("check class", {
+  grouped_data <- group_by(df, tailnum)
+  grouped_data_class <- class(grouped_data$grouped_data)
+  attributes(grouped_data_class) <- NULL
+  expect_equal(class(grouped_data), "SparkGroupedData")
+  expect_equal(grouped_data_class, "GroupedData")
+  expect_equal(grouped_data$DataFrame, df)
+})
+
+test_that("one column", {
+  grouped_data <- group_by(df, tailnum)
+  result <- summarize(grouped_data, size=n(distance)) %>% head
+  expect_equal(result$tailnum, c("N600LR", "N3HAAA", "N77518", "N66051", "N5DCAA", "N947DL"))
+  expect_equal(result$size, c(5, 2, 2, 1, 1, 2))
+})
+
+test_that("three columns", {
+  grouped_data <- group_by(df, year, month, day)
+  result <- summarize(grouped_data, size=n(distance)) %>% head
+  expect_equal(result$year, c(2013, 2013, 2013, 2013, 2013, 2013))
+  expect_equal(result$month, c(1, 6, 1, 6, 1, 6))
+  expect_equal(result$day, c(5, 20, 6, 21, 7, 22))
+  expect_equal(result$size, c(16, 28, 35, 25, 24, 26))
+})
+
+test_that("with pipe", {
+  result <- df %>%
+    group_by(tailnum) %>%
+    summarize(size=n(distance)) %>% head
+  expect_equal(result$tailnum, c("N600LR", "N3HAAA", "N77518", "N66051", "N5DCAA", "N947DL"))
+  expect_equal(result$size, c(5, 2, 2, 1, 1, 2))
 })

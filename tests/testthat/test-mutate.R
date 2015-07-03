@@ -29,3 +29,15 @@
 #   act <- c(columns(df), "gain", "gain_per_hour")
 #   expect_equal(SparkR::columns(result), act)
 # })
+# 
+# test_that("with pipe", {
+#   result <- df %>% mutate(gain = arr_delay - dep_delay)
+#   act <- c(columns(df), "gain")
+#   expect_equal(SparkR::columns(result), act)
+# })
+# 
+# test_that("with pipe2", {
+#   result <- df %>% mutate(gain = arr_delay - dep_delay, gain_per_hour = gain/(air_time/60))
+#   act <- c(columns(df), "gain", "gain_per_hour")
+#   expect_equal(SparkR::columns(result), act)
+# })

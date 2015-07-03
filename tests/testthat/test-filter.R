@@ -43,3 +43,8 @@
 #   result <- filter(df, month == x$month) %>% count
 #   expect_equal(result, 883)
 # })
+# 
+# test_that("with pipe", {
+#   result <- df %>% filter(month == 12) %>% count
+#   expect_equal(result, 883)
+# })

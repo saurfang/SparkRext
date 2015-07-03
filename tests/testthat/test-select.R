@@ -83,3 +83,8 @@
 #   act <- Filter(Negate(function(col) col %in% c("year", "month", "day")), columns(result))
 #   expect_equal(columns(result), act)
 # })
+# 
+# test_that("with pipe", {
+#   result <- df %>% select(year)
+#   expect_equal(columns(result), "year")
+# })

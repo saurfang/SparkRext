@@ -39,3 +39,7 @@
 #   expect_equal(result$dep_delay, rep(0, 6))
 # })
 # 
+# test_that("with pipe", {
+#   result <- df %>% arrange(month) %>% head
+#   expect_equal(result$month, rep(1, 6))
+# })

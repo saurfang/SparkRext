@@ -38,3 +38,8 @@
 #   result <- summarize(df, last_distance=last(distance)) %>% collect
 #   expect_equal(result$last_distance, 1400)
 # })
+# 
+# test_that("with pipe", {
+#   result <- df %>% summarize(size=n(distance)) %>% collect
+#   expect_equal(result$size, 10000)
+# })
