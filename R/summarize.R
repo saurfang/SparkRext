@@ -6,6 +6,7 @@ summarize <- function(.data, ..., .dots = lazyeval::lazy_dots(...)) {
 #' @export
 summarise <- summarize
 
+#' @export
 summarize.DataFrame <- function(.data, ..., .dots = lazyeval::lazy_dots(...)) {
   dfname <- as.character(substitute(.data))
   columns <- SparkR::columns(.data)
@@ -20,6 +21,7 @@ summarize.DataFrame <- function(.data, ..., .dots = lazyeval::lazy_dots(...)) {
   do.call(SparkR::summarize, args)
 }
 
+#' @export
 summarize.SparkGroupedData <- function(.data, ..., .dots = lazyeval::lazy_dots(...)) {
   df <- .data$DataFrame
   columns <- SparkR::columns(df)
