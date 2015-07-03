@@ -148,3 +148,26 @@ test_that("use other function", {
   result <- arrange(df, abs(dep_delay)) %>% head
   expect_equal(result$dep_delay, rep(0, 6))
 })
+
+context("summarize")
+
+test_that("one column", {
+  result <- summarize(df, size=n(distance)) %>% collect
+  expect_equal(result$size, 10000)
+})
+
+test_that("two columns", {
+  result <- summarize(df, months=n_distinct(month), days=n_distinct(day)) %>% collect
+  expect_equal(result$months, 12)
+  expect_equal(result$days, 31)
+})
+
+test_that("first()", {
+  result <- summarize(df, first_distance=first(distance)) %>% collect
+  expect_equal(result$first_distance, 488)
+})
+
+test_that("last()", {
+  result <- summarize(df, last_distance=last(distance)) %>% collect
+  expect_equal(result$last_distance, 1400)
+})
