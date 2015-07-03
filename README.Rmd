@@ -60,6 +60,7 @@ With NSE, you don't need to type quotations or names of DataFrame that the colum
 I have created **SparkRext** package to use NSE version of the functions in SparkR.
 
 ```{r echo=FALSE, cache=FALSE, eval=TRUE}
+library(SparkRext)
 prior_package(SparkRext)
 ```
 

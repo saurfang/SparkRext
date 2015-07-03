@@ -62,9 +62,6 @@ With NSE, you don't need to type quotations or names of DataFrame that the colum
 I have created **SparkRext** package to use NSE version of the functions in SparkR.
 
 
-```
-## Error in eval(expr, envir, enclos): could not find function "prior_package"
-```
 
 
 ```r
