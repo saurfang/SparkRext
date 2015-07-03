@@ -88,3 +88,8 @@
 #   result <- df %>% select(year)
 #   expect_equal(columns(result), "year")
 # })
+# 
+# test_that("character input", {
+#   result <- select(df, "year")
+#   expect_equal(columns(result), "year")
+# })

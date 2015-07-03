@@ -117,6 +117,11 @@ test_that("minus number column sequence", {
   expect_equal(columns(result), act)
 })
 
+test_that("character input", {
+  result <- select(df, "year")
+  expect_equal(columns(result), "year")
+})
+
 test_that("with pipe", {
   result <- df %>% select(year)
   expect_equal(columns(result), "year")
