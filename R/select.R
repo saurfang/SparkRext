@@ -1,4 +1,3 @@
-#'
 #' @export
 select <- function(.data, ..., .dots = lazyeval::lazy_dots(...)) {
   columns <- SparkR::columns(.data)

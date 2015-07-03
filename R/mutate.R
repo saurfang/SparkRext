@@ -1,4 +1,3 @@
-#'
 #' @export
 mutate <- function(.data, ..., .dots = lazyeval::lazy_dots(...)) {
   dfname <- as.character(substitute(.data))

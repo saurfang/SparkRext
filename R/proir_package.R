@@ -1,11 +1,9 @@
-#'
 #' @export
 unload_package <- function(pkg_name) {
   pkg_name <- as.character(substitute(pkg_name))
   unload_package_(pkg_name)
 }
 
-#'
 #' @export
 unload_package_ <- function(pkg_name) {
   packages <- Filter(function(x) stringr::str_detect(x, "^package:"), search())
@@ -30,16 +28,13 @@ unload_package_ <- function(pkg_name) {
   unique(result_packages)
 }
 
-#'
 #' @export
 prior_package <- function(pkg_name) {
   pkg_name <- as.character(substitute(pkg_name))
   prior_package_(pkg_name)
 }
 
-#'
 #' @export
-#' @rdname prior_package
 prior_package_ <- function(pkg_name) {
   pkg_names <- unload_package_(pkg_name)
   if(pkg_name == "SparkRext") {
