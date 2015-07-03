@@ -1,4 +1,4 @@
-.onAttach <- function(libname, pkgname) {
+.onLoad <- function(libname, pkgname) {
   if(!require(SparkR)) {
     warning("Failed to load 'SparkR' package. You must install it or export path to library.")
   } else if(packageVersion("SparkR") < 1.4) {
