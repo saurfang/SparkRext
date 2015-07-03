@@ -14,9 +14,6 @@ One of the reasons is that SparkR DataFrames present an API similar to **dplyr**
 For example:
 
 
-```
-## Launching java with spark-submit command /home/makiyama/bin/spark/bin/spark-submit  sparkr-shell /tmp/Rtmpe7yoCy/backend_port5c0e69f67f75
-```
 
 
 ```r
@@ -65,6 +62,9 @@ With NSE, you don't need to type quotations or names of DataFrame that the colum
 I have created **SparkRext** package to use NSE version of the functions in SparkR.
 
 
+```
+## Error in eval(expr, envir, enclos): could not find function "prior_package"
+```
 
 
 ```r
