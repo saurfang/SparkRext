@@ -14,17 +14,13 @@ One of the reasons is that SparkR DataFrames present an API similar to **dplyr**
 For example:
 
 
+```
+## Launching java with spark-submit command /home/makiyama/bin/spark/bin/spark-submit  sparkr-shell /tmp/Rtmpe7yoCy/backend_port5c0e69f67f75
+```
 
 
 ```r
 df <- createDataFrame(sqlContext, iris)
-```
-
-```
-## Error in eval(expr, envir, enclos): could not find function "createDataFrame"
-```
-
-```r
 df %>%
   select("Sepal_Length", "Species") %>%
   filter(df$Sepal_Length >= 5.5) %>%
@@ -34,7 +30,10 @@ df %>%
 ```
 
 ```
-## Error in eval(expr, envir, enclos): could not find function "%>%"
+##      Species count     mean
+## 1 versicolor    44 6.050000
+## 2     setosa     5 5.640000
+## 3  virginica    49 6.622449
 ```
 
 This is very cool. But I have a little discontent.

@@ -7,7 +7,7 @@ output:
 ---
 
 ```{r echo=FALSE, cache=FALSE}
-knitr::opts_chunk$set(echo=TRUE, warning=FALSE, message=FALSE, cache=TRUE, error=TRUE)
+knitr::opts_chunk$set(echo=TRUE, warning=FALSE, message=FALSE, cache=FALSE, error=TRUE)
 knitr::knit_hooks$set(document = function(x) {
   SparkR::sparkR.stop()
   x
@@ -24,8 +24,8 @@ One of the reasons is that SparkR DataFrames present an API similar to **dplyr**
 
 For example:
 
-```{r echo=FALSE, cache=FALSE, eval=FALSE}
-suppressWarnings(suppressPackageStartupMessages(library(SparkRext)))
+```{r echo=FALSE, cache=FALSE, eval=TRUE}
+library(SparkRext)
 sc <- sparkR.init(master="local")
 sqlContext <- sparkRSQL.init(sc)
 prior_package(SparkR)
@@ -59,10 +59,7 @@ With NSE, you don't need to type quotations or names of DataFrame that the colum
 
 I have created **SparkRext** package to use NSE version of the functions in SparkR.
 
-```{r echo=FALSE, cache=FALSE, eval=FALSE}
-library(SparkRext)
-sc <- sparkR.init(master="local")
-sqlContext <- sparkRSQL.init(sc)
+```{r echo=FALSE, cache=FALSE, eval=TRUE}
 prior_package(SparkRext)
 ```
 
