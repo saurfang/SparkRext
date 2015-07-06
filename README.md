@@ -678,3 +678,5 @@ microbenchmark(
 ##  dplyr_pipe() 2.120685 2.282281 2.438163 2.356234 2.458864 3.841641   100
 ##  pipeR_pipe() 1.913292 2.049066 2.195556 2.120944 2.196404 3.722005   100
 ```
+
+If you want to use pipe operator on the others, please overwrite it.

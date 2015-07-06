@@ -400,3 +400,5 @@ microbenchmark(
   pipeR_pipe()
 )
 ```
+
+If you want to use pipe operator on the others, please overwrite it.
