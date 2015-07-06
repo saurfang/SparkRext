@@ -8,10 +8,19 @@ output:
 
 ```{r echo=FALSE, cache=FALSE}
 knitr::opts_chunk$set(echo=TRUE, warning=FALSE, message=FALSE, cache=TRUE, error=TRUE)
+```
+
+```{r echo=FALSE}
 knitr::knit_hooks$set(document = function(x) {
   SparkR::sparkR.stop()
   x
 })
+```
+
+```{r echo=FALSE, eval=FALSE}
+SparkRext::prior_package(SparkRext)
+sc <- sparkR.init(master="local")
+sqlContext <- sparkRSQL.init(sc)
 ```
 
 ## 1. Overview
@@ -57,7 +66,7 @@ iris %>%
 It's very smart.  
 With NSE, you don't need to type quotations or names of DataFrame that the columns belong to.
 
-I have created **SparkRext** package to use NSE version of the functions in SparkR.
+The package **SparkRext** have been created to make SparkR be closer to dplyr.
 
 ```{r echo=FALSE, cache=FALSE, eval=TRUE}
 library(SparkRext)
@@ -74,3 +83,66 @@ df %>%
   summarize(count=n(Sepal_Length), mean=mean(Sepal_Length)) %>%
   collect  
 ```
+
+SparkRext redefines the functions of SparkR to enable NSE inputs.  
+As a result, the functions will be able to be used in the same way as dplyr.
+
+## 2. How to install
+
+The source code for SparkRext package is available on GitHub at
+
+- https://github.com/hoxo-m/SparkRext.
+
+You can install the package from there.
+
+```{r eval=FALSE}
+install.packages("devtools") # if you have not installed "devtools" package
+devtools::install_github("hoxo-m/dplyrr")
+```
+
+## 3. Functions
+
+SparkRext redefines six functions on SparkR.
+
+- filter()
+- select()
+- mutate()
+- arrange()
+- summarize()
+- group_by()
+
+In this section, these funcions are explained.
+
+For illustration, let’s prepare data.
+
+```{r}
+library(dplyr)
+library(nycflights13)
+
+set.seed(123)
+data <- sample_n(flights, 10000)
+
+prior_package(SparkRext)
+
+df <- createDataFrame(sqlContext, data.frame(data))
+df %>% head
+```
+
+### 3-1. `filter()`
+
+`filter()` is used to extract rows that the conditions specified are satisfied.
+
+```{r}
+df %>% filter(month == 12, day == 31) %>% head
+```
+
+```{r}
+df %>% filter(month == 12 | day == 31) %>% head
+```
+
+Note that `filter()` of SparkR cannot accept multiple conditions at once.
+
+### 3-2. `select()`
+
+`select()` is used to extract columns specified.
+
