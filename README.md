@@ -126,7 +126,8 @@ library(nycflights13)
 set.seed(123)
 data <- sample_n(flights, 10000)
 
-prior_package(SparkRext)
+library(SparkRext)
+prior_library(SparkRext)
 
 df <- createDataFrame(sqlContext, data.frame(data))
 df %>% head
@@ -519,21 +520,21 @@ When you can load SparkR package, you will be also able to use SparkRext package
 ```r
 # Load SparkRext
 library(SparkRext)
-prior_package(SparkRext)
+prior_library(SparkRext)
 
 # Create Spark context and SQL context
 sc <- sparkR.init(master="local")
 sqlContext <- sparkRSQL.init(sc)
 
 # Preparation of data
-prior_package(dplyr)
+prior_library(dplyr)
 library(nycflights13)
 
 set.seed(123)
 data <- sample_n(flights, 10000)
 
 # Create DataFrame
-prior_package(SparkRext)
+prior_library(SparkRext)
 df <- createDataFrame(sqlContext, data.frame(data))
 
 # Play with DataFrame
@@ -584,15 +585,15 @@ print(result)
 
 ## 5. Caution points
 
-### 5-1. `prior_package()`
+### 5-1. `prior_library()`
 
 SparkRext is sensitive to the order of loading of libraries.  
-Thus, you should use `prior_package()` after `library()`.
+Thus, you should use `prior_library()` after `library()`.
 
 
 ```r
 library(SparkRext)
-prior_package(SparkRext)
+prior_library(SparkRext)
 ```
 
 By doing this, the functions of SparkRext will be called with the highest priority.  
@@ -612,7 +613,7 @@ If you want to switch to SparkR, you can do it.
 
 
 ```r
-prior_package(SparkR)
+prior_library(SparkR)
 head(search())
 ```
 
@@ -625,7 +626,7 @@ You can also switch to dplyr.
 
 
 ```r
-prior_package(dplyr)
+prior_library(dplyr)
 head(search())
 ```
 
@@ -675,8 +676,8 @@ microbenchmark(
 ```
 ## Unit: milliseconds
 ##          expr      min       lq     mean   median       uq      max neval
-##  dplyr_pipe() 2.120685 2.282281 2.438163 2.356234 2.458864 3.841641   100
-##  pipeR_pipe() 1.913292 2.049066 2.195556 2.120944 2.196404 3.722005   100
+##  dplyr_pipe() 2.068075 2.245922 2.394440 2.286836 2.430241 3.846421   100
+##  pipeR_pipe() 1.803371 2.026255 2.182761 2.098782 2.190771 3.809419   100
 ```
 
 If you want to use pipe operator on the others, please overwrite it.

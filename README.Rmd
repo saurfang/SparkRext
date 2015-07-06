@@ -18,7 +18,7 @@ knitr::knit_hooks$set(document = function(x) {
 ```
 
 ```{r echo=FALSE, eval=FALSE}
-SparkRext::prior_package(SparkRext)
+SparkRext::prior_library(SparkRext)
 sc <- sparkR.init(master="local")
 sqlContext <- sparkRSQL.init(sc)
 ```
@@ -37,7 +37,7 @@ For example:
 library(SparkRext)
 sc <- sparkR.init(master="local")
 sqlContext <- sparkRSQL.init(sc)
-prior_package(SparkR)
+prior_library(SparkR)
 ```
 
 ```{r}
@@ -70,7 +70,7 @@ The package **SparkRext** have been created to make SparkR be closer to dplyr.
 
 ```{r echo=FALSE, cache=FALSE, eval=TRUE}
 library(SparkRext)
-prior_package(SparkRext)
+prior_library(SparkRext)
 ```
 
 ```{r}
@@ -122,7 +122,8 @@ library(nycflights13)
 set.seed(123)
 data <- sample_n(flights, 10000)
 
-prior_package(SparkRext)
+library(SparkRext)
+prior_library(SparkRext)
 
 df <- createDataFrame(sqlContext, data.frame(data))
 df %>% head
@@ -281,21 +282,21 @@ When you can load SparkR package, you will be also able to use SparkRext package
 ```{r eval=FALSE}
 # Load SparkRext
 library(SparkRext)
-prior_package(SparkRext)
+prior_library(SparkRext)
 
 # Create Spark context and SQL context
 sc <- sparkR.init(master="local")
 sqlContext <- sparkRSQL.init(sc)
 
 # Preparation of data
-prior_package(dplyr)
+prior_library(dplyr)
 library(nycflights13)
 
 set.seed(123)
 data <- sample_n(flights, 10000)
 
 # Create DataFrame
-prior_package(SparkRext)
+prior_library(SparkRext)
 df <- createDataFrame(sqlContext, data.frame(data))
 
 # Play with DataFrame
@@ -331,14 +332,14 @@ print(result)
 
 ## 5. Caution points
 
-### 5-1. `prior_package()`
+### 5-1. `prior_library()`
 
 SparkRext is sensitive to the order of loading of libraries.  
-Thus, you should use `prior_package()` after `library()`.
+Thus, you should use `prior_library()` after `library()`.
 
 ```{r}
 library(SparkRext)
-prior_package(SparkRext)
+prior_library(SparkRext)
 ```
 
 By doing this, the functions of SparkRext will be called with the highest priority.  
@@ -351,14 +352,14 @@ head(search())
 If you want to switch to SparkR, you can do it.
 
 ```{r}
-prior_package(SparkR)
+prior_library(SparkR)
 head(search())
 ```
 
 You can also switch to dplyr.
 
 ```{r}
-prior_package(dplyr)
+prior_library(dplyr)
 head(search())
 ```
 
@@ -371,7 +372,7 @@ The reason of it is that the pipe operator of pipeR is faster than magrittr.
 I will show that below.
 
 ```{r echo=FALSE}
-prior_package(dplyr)
+prior_library(dplyr)
 ```
 
 ```{r}

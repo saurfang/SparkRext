@@ -29,13 +29,13 @@ unload_package_ <- function(pkg_name) {
 }
 
 #' @export
-prior_package <- function(pkg_name) {
+prior_library <- function(pkg_name) {
   pkg_name <- as.character(substitute(pkg_name))
   prior_package_(pkg_name)
 }
 
 #' @export
-prior_package_ <- function(pkg_name) {
+prior_library_ <- function(pkg_name) {
   pkg_names <- unload_package_(pkg_name)
   if(pkg_name == "SparkRext") {
     unload_package(SparkR)
@@ -45,3 +45,9 @@ prior_package_ <- function(pkg_name) {
     suppressPackageStartupMessages(library(pkg_name, character.only = TRUE))
   }
 }
+
+#' @export
+prior_package <- prior_library
+
+#' @export
+prior_package_ <- prior_library_
