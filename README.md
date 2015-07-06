@@ -107,12 +107,12 @@ devtools::install_github("hoxo-m/dplyrr")
 
 SparkRext redefines six functions on SparkR.
 
-- filter()
-- select()
-- mutate()
-- arrange()
-- summarize()
-- group_by()
+- `filter()`
+- `select()`
+- `mutate()`
+- `arrange()`
+- `summarize()`
+- `group_by()`
 
 In this section, these funcions are explained.
 
