@@ -409,8 +409,26 @@ df %>% arrange(month, desc(day)) %>% head
 
 You can also sort by values that are transformed from columns.
 
-```{R}
+
+```r
 df %>% arrange(abs(dep_delay)) %>% head
+```
+
+```
+##   year month day dep_time dep_delay arr_time arr_delay carrier tailnum
+## 1 2013     2  18      605         0      844       -23      B6  N629JB
+## 2 2013     8  22      640         0      935        11      UA  N36207
+## 3 2013     3  13     1738         0     2002        -2      FL  N944AT
+## 4 2013     3   5     1840         0     2142       -23      DL  N3772H
+## 5 2013    10   4     1710         0     1821       -14      MQ  N724MQ
+## 6 2013     2  19     2130         0     2255         0      B6  N228JB
+##   flight origin dest air_time distance hour minute
+## 1    501    JFK  FLL      138     1069    6      5
+## 2   1162    EWR  TPA      138      997    6     40
+## 3    806    LGA  ATL      113      762   17     38
+## 4   1643    JFK  SEA      343     2422   18     40
+## 5   3365    JFK  DCA       43      213   17     10
+## 6    104    JFK  BUF       60      301   21     30
 ```
 
 ### 3-5. `summarize()`
@@ -444,7 +462,7 @@ Like dplyr, you can use `summarise()` instead of `simmarize()`.
 
 ### 3-6. `group_by()`
 
-`group_by()` is used to describe how to break a DataFrame down into groups of rows.
+`group_by()` is used to describe how to break a DataFrame down into groups of rows.  
 Usually it is used with `summarize()` to collapse each group to a single row.
 
 
@@ -490,3 +508,173 @@ Unlike dplyr, only `summarize()` can receive the results of `group_by()`.
 
 ## 4. How to use
 
+To install SparkR 1.4.0, the next articles may be useful.
+
+- [How to use SparkR within Rstudio?](http://www.r-bloggers.com/how-to-use-sparkr-within-rstudio/)
+- [SparkR with Rstudio in Ubuntu 12.04](http://www.r-bloggers.com/sparkr-with-rstudio-in-ubuntu-12-04/)
+
+When you can load SparkR package, you will be also able to use SparkRext package.
+
+
+```r
+# Load SparkRext
+library(SparkRext)
+prior_package(SparkRext)
+
+# Create Spark context and SQL context
+sc <- sparkR.init(master="local")
+sqlContext <- sparkRSQL.init(sc)
+
+# Preparation of data
+prior_package(dplyr)
+library(nycflights13)
+
+set.seed(123)
+data <- sample_n(flights, 10000)
+
+# Create DataFrame
+prior_package(SparkRext)
+df <- createDataFrame(sqlContext, data.frame(data))
+
+# Play with DataFrame
+result <- df %>%
+  filter(month == 12, day == 31) %>%
+  mutate(gain = arr_delay - dep_delay, 
+         gain_per_hour = gain/(air_time/60)) %>%
+  select(tailnum, distance, gain_per_hour) %>%
+  group_by(tailnum) %>%
+  summarize(count = n(tailnum), 
+            mean_distance = mean(distance), 
+            mean_gain_per_hour = mean(gain_per_hour)) %>%
+  collect
+
+print(result)
+```
+
+
+```
+##    tailnum count mean_distance mean_gain_per_hour
+## 1   N299PQ     1           301         -0.8571429
+## 2   N903XJ     1          1391         -6.6666667
+## 3   N15555     1           266        -21.8181818
+## 4   N588JB     1           264         -8.8888889
+## 5   N651JB     1          1608          1.5151515
+## 6   N715JB     1           944          1.2162162
+## 7   N138EV     1           269        -42.0000000
+## 8   N37281     1          2565         -0.3183024
+## 9   N17730     1          1634         -4.7524752
+## 10  N630VA     1          2475          0.3314917
+## 11  N501MQ     2           348         -4.7842402
+## 12  N292JB     1           301         10.6451613
+## 13  N630JB     1           944         -0.3870968
+## 14  N403UA     1          1065         -8.4076433
+## 15  N355JB     1           266          7.3469388
+## 16  N911FJ     1           544        -10.4854369
+## 17  N66808     1          2565          0.3287671
+## 18  N374DA     1          2454          2.3268698
+## 19  N295PQ     1           765         -0.4511278
+## 20  N214FR     1          1620          6.9402985
+## 21  N599JB     1          1076          7.8750000
+## 22  N334JB     1           301          3.8095238
+## 23  N834JB     1          2586         -0.3234501
+## 24  N655MQ     1           425         -2.0454545
+## 25  N216JB     1           209         -7.2000000
+## 26  N17719     1          1023         -5.4901961
+```
+
+## 5. Caution points
+
+### 5-1. `prior_package()`
+
+SparkRext is sensitive to the order of loading of libraries.  
+Thus, you should use `prior_package()` after `library()`.
+
+
+```r
+library(SparkRext)
+prior_package(SparkRext)
+```
+
+By doing this, the functions of SparkRext will be called with the highest priority.  
+You can confirm this by checking the search path:
+
+
+```r
+head(search())
+```
+
+```
+## [1] ".GlobalEnv"           "package:SparkRext"    "package:SparkR"      
+## [4] "package:nycflights13" "package:dplyr"        "package:stats"
+```
+
+If you want to switch to SparkR, you can do it.
+
+
+```r
+prior_package(SparkR)
+head(search())
+```
+
+```
+## [1] ".GlobalEnv"           "package:SparkR"       "package:SparkRext"   
+## [4] "package:nycflights13" "package:dplyr"        "package:stats"
+```
+
+You can also switch to dplyr.
+
+
+```r
+prior_package(dplyr)
+head(search())
+```
+
+```
+## [1] ".GlobalEnv"           "package:dplyr"        "package:SparkR"      
+## [4] "package:SparkRext"    "package:nycflights13" "package:stats"
+```
+
+### 5-2. Pipe operator `%>%`
+
+You can use pipe operator `%>%` without loading magrittr or dplyr.  
+The pipe operator imports from **pipeR** package. (See [pipeR](http://renkun.me/pipeR/))
+
+The reason of it is that the pipe operator of pipeR is faster than magrittr.  
+I will show that below.
+
+
+
+
+```r
+library(dplyr)
+library(pipeR)
+library(microbenchmark)
+
+dplyr_pipe <- function() {
+  iris %>%
+    select(Sepal.Length, Species) %>%
+    filter(Sepal.Length >= 5.5) %>%
+    group_by(Species) %>%
+    summarize(count = n(), mean = mean(Sepal.Length))
+}
+
+pipeR_pipe <- function() {
+  iris %>>%
+    select(Sepal.Length, Species) %>>%
+    filter(Sepal.Length >= 5.5) %>>%
+    group_by(Species) %>>%
+    summarize(count = n(), mean = mean(Sepal.Length))
+}
+
+microbenchmark(
+  dplyr_pipe(),
+  pipeR_pipe()
+)
+```
+
+```
+## Unit: milliseconds
+##          expr      min       lq     mean   median       uq      max neval
+##  dplyr_pipe() 2.120685 2.282281 2.438163 2.356234 2.458864 3.841641   100
+##  pipeR_pipe() 1.913292 2.049066 2.195556 2.120944 2.196404 3.722005   100
+```

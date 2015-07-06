@@ -218,7 +218,7 @@ df %>% arrange(month, desc(day)) %>% head
 
 You can also sort by values that are transformed from columns.
 
-```{R}
+```{r}
 df %>% arrange(abs(dep_delay)) %>% head
 ```
 
@@ -247,7 +247,7 @@ Like dplyr, you can use `summarise()` instead of `simmarize()`.
 
 ### 3-6. `group_by()`
 
-`group_by()` is used to describe how to break a DataFrame down into groups of rows.
+`group_by()` is used to describe how to break a DataFrame down into groups of rows.  
 Usually it is used with `summarize()` to collapse each group to a single row.
 
 ```{r}
@@ -271,3 +271,132 @@ Unlike dplyr, only `summarize()` can receive the results of `group_by()`.
 
 ## 4. How to use
 
+To install SparkR 1.4.0, the next articles may be useful.
+
+- [How to use SparkR within Rstudio?](http://www.r-bloggers.com/how-to-use-sparkr-within-rstudio/)
+- [SparkR with Rstudio in Ubuntu 12.04](http://www.r-bloggers.com/sparkr-with-rstudio-in-ubuntu-12-04/)
+
+When you can load SparkR package, you will be also able to use SparkRext package.
+
+```{r eval=FALSE}
+# Load SparkRext
+library(SparkRext)
+prior_package(SparkRext)
+
+# Create Spark context and SQL context
+sc <- sparkR.init(master="local")
+sqlContext <- sparkRSQL.init(sc)
+
+# Preparation of data
+prior_package(dplyr)
+library(nycflights13)
+
+set.seed(123)
+data <- sample_n(flights, 10000)
+
+# Create DataFrame
+prior_package(SparkRext)
+df <- createDataFrame(sqlContext, data.frame(data))
+
+# Play with DataFrame
+result <- df %>%
+  filter(month == 12, day == 31) %>%
+  mutate(gain = arr_delay - dep_delay, 
+         gain_per_hour = gain/(air_time/60)) %>%
+  select(tailnum, distance, gain_per_hour) %>%
+  group_by(tailnum) %>%
+  summarize(count = n(tailnum), 
+            mean_distance = mean(distance), 
+            mean_gain_per_hour = mean(gain_per_hour)) %>%
+  collect
+
+print(result)
+```
+
+```{r echo=FALSE}
+# Play with DataFrame
+result <- df %>%
+  filter(month == 12, day == 31) %>%
+  mutate(gain = arr_delay - dep_delay, 
+         gain_per_hour = gain/(air_time/60)) %>%
+  select(tailnum, distance, gain_per_hour) %>%
+  group_by(tailnum) %>%
+  summarize(count = n(tailnum), 
+            mean_distance = mean(distance), 
+            mean_gain_per_hour = mean(gain_per_hour)) %>%
+  collect
+
+print(result)
+```
+
+## 5. Caution points
+
+### 5-1. `prior_package()`
+
+SparkRext is sensitive to the order of loading of libraries.  
+Thus, you should use `prior_package()` after `library()`.
+
+```{r}
+library(SparkRext)
+prior_package(SparkRext)
+```
+
+By doing this, the functions of SparkRext will be called with the highest priority.  
+You can confirm this by checking the search path:
+
+```{r}
+head(search())
+```
+
+If you want to switch to SparkR, you can do it.
+
+```{r}
+prior_package(SparkR)
+head(search())
+```
+
+You can also switch to dplyr.
+
+```{r}
+prior_package(dplyr)
+head(search())
+```
+
+### 5-2. Pipe operator `%>%`
+
+You can use pipe operator `%>%` without loading magrittr or dplyr.  
+The pipe operator imports from **pipeR** package. (See [pipeR](http://renkun.me/pipeR/))
+
+The reason of it is that the pipe operator of pipeR is faster than magrittr.  
+I will show that below.
+
+```{r echo=FALSE}
+prior_package(dplyr)
+```
+
+```{r}
+library(dplyr)
+library(pipeR)
+library(microbenchmark)
+
+dplyr_pipe <- function() {
+  iris %>%
+    select(Sepal.Length, Species) %>%
+    filter(Sepal.Length >= 5.5) %>%
+    group_by(Species) %>%
+    summarize(count = n(), mean = mean(Sepal.Length))
+}
+
+pipeR_pipe <- function() {
+  iris %>>%
+    select(Sepal.Length, Species) %>>%
+    filter(Sepal.Length >= 5.5) %>>%
+    group_by(Species) %>>%
+    summarize(count = n(), mean = mean(Sepal.Length))
+}
+
+microbenchmark(
+  dplyr_pipe(),
+  pipeR_pipe()
+)
+```
