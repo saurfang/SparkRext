@@ -146,3 +146,128 @@ Note that `filter()` of SparkR cannot accept multiple conditions at once.
 
 `select()` is used to extract columns specified.
 
+```{r}
+df %>% select(year, month, day) %>% head
+```
+
+Continuous columns can be extracted using a colon `:`.
+
+```{r}
+df %>% select(year:day) %>% head
+```
+
+You can use the minus sign `-` to extract columns with the exception of columns specified.
+
+```{r}
+df %>% select(-year, -month, -day) %>% head
+```
+
+You can also extract columns by using column numbers.
+
+```{r}
+df %>% select(1, 2, 3) %>% head
+```
+
+You can use the select utility functions in dplyr such as `starts_with()`.
+
+```{r}
+df %>% select(starts_with("arr")) %>% head
+```
+
+All select utility functions is below.
+
+- `starts_with(match, ignore.case = TRUE)`
+- `ends_with(match, ignore.case = TRUE)`
+- `contains(match, ignore.case = TRUE)`
+- `matches(match, ignore.case = TRUE)`
+- `num_range(prefix, range, width = NULL)`
+- `one_of(...)`
+- `everything()`
+
+Note that select() of SparkR cannot accept a variety of input like this.
+
+### 3-3. `mutate()`
+
+`mutate()` is used to add new columns.
+
+```{r}
+df %>% mutate(gain = arr_delay - dep_delay, speed = distance / air_time * 60) %>% head
+```
+
+Note that `mutate()` of SparkR cannot accept multiple input at once.  
+Furthermore, `mutate()` of SparkR cannot also reuse columns added like below.
+
+```{r}
+df %>% mutate(gain = arr_delay - dep_delay, gain_per_hour = gain/(air_time/60)) %>% head
+```
+
+### 3-4. `arrange()`
+
+`arrange()` is used to sort rows by columns specified.
+
+```{r}
+df %>% arrange(month, day) %>% head
+```
+
+It will be sorted in ascending order if you write just column names.  
+If you want to sort in descending order, you can use `desc()`.
+
+```{r}
+df %>% arrange(month, desc(day)) %>% head
+```
+
+You can also sort by values that are transformed from columns.
+
+```{R}
+df %>% arrange(abs(dep_delay)) %>% head
+```
+
+### 3-5. `summarize()`
+
+`summarize()` is used to collapse a DataFrame to a single row.
+
+```{r}
+df %>% summarize(count = n(year)) %>% collect
+```
+
+Typically, `summarize()` is used with `group_by()` to collapse each group to a single row.
+
+As far as I know, you can use the following functions in `summarize()`.
+
+- `n()`
+- `n_distinct()`
+- `approxCountDistinct()`
+- `mean()`
+- `first()`
+- `last()`
+
+It seems that other aggregate functions are available in Scala (See [docs](http://spark.apache.org/docs/1.4.0/api/scala/index.html#org.apache.spark.sql.functions$)).
+
+Like dplyr, you can use `summarise()` instead of `simmarize()`.
+
+### 3-6. `group_by()`
+
+`group_by()` is used to describe how to break a DataFrame down into groups of rows.
+Usually it is used with `summarize()` to collapse each group to a single row.
+
+```{r}
+df %>% 
+  group_by(tailnum) %>%
+  summarize(mean_distance = mean(distance)) %>% 
+  head
+```
+
+You can indicate multiple colmuns.
+
+```{r}
+df %>% 
+  group_by(year, month, day) %>%
+  summarize(count = n(year)) %>% 
+  arrange(year, month, day) %>%
+  head
+```
+
+Unlike dplyr, only `summarize()` can receive the results of `group_by()`.
+
+## 4. How to use
+

@@ -203,3 +203,290 @@ Note that `filter()` of SparkR cannot accept multiple conditions at once.
 
 `select()` is used to extract columns specified.
 
+
+```r
+df %>% select(year, month, day) %>% head
+```
+
+```
+##   year month day
+## 1 2013    12  15
+## 2 2013     7  17
+## 3 2013     3   2
+## 4 2013     8  19
+## 5 2013     9   9
+## 6 2013     1  18
+```
+
+Continuous columns can be extracted using a colon `:`.
+
+
+```r
+df %>% select(year:day) %>% head
+```
+
+```
+##   year month day
+## 1 2013    12  15
+## 2 2013     7  17
+## 3 2013     3   2
+## 4 2013     8  19
+## 5 2013     9   9
+## 6 2013     1  18
+```
+
+You can use the minus sign `-` to extract columns with the exception of columns specified.
+
+
+```r
+df %>% select(-year, -month, -day) %>% head
+```
+
+```
+##   dep_time dep_delay arr_time arr_delay carrier tailnum flight origin dest
+## 1     2124        -4     2322         1      UA  N801UA    289    EWR  DTW
+## 2      651        -9      936       -28      DL  N194DN    763    JFK  LAX
+## 3     1636         1     1800         0      WN  N475WN   1501    LGA  MKE
+## 4     1058        -2     1203       -32      WN  N765SW     51    LGA  MDW
+## 5     1251        -9     1412         3      US  N963UW   2148    LGA  BOS
+## 6     1259        -1     1556       -14      WN  N654SW   2239    EWR  HOU
+##   air_time distance hour minute
+## 1       88      488   21     24
+## 2      306     2475    6     51
+## 3      103      738   16     36
+## 4      107      725   10     58
+## 5       38      184   12     51
+## 6      222     1411   12     59
+```
+
+You can also extract columns by using column numbers.
+
+
+```r
+df %>% select(1, 2, 3) %>% head
+```
+
+```
+##   year month day
+## 1 2013    12  15
+## 2 2013     7  17
+## 3 2013     3   2
+## 4 2013     8  19
+## 5 2013     9   9
+## 6 2013     1  18
+```
+
+You can use the select utility functions in dplyr such as `starts_with()`.
+
+
+```r
+df %>% select(starts_with("arr")) %>% head
+```
+
+```
+##   arr_time arr_delay
+## 1     2322         1
+## 2      936       -28
+## 3     1800         0
+## 4     1203       -32
+## 5     1412         3
+## 6     1556       -14
+```
+
+All select utility functions is below.
+
+- `starts_with(match, ignore.case = TRUE)`
+- `ends_with(match, ignore.case = TRUE)`
+- `contains(match, ignore.case = TRUE)`
+- `matches(match, ignore.case = TRUE)`
+- `num_range(prefix, range, width = NULL)`
+- `one_of(...)`
+- `everything()`
+
+Note that select() of SparkR cannot accept a variety of input like this.
+
+### 3-3. `mutate()`
+
+`mutate()` is used to add new columns.
+
+
+```r
+df %>% mutate(gain = arr_delay - dep_delay, speed = distance / air_time * 60) %>% head
+```
+
+```
+##   year month day dep_time dep_delay arr_time arr_delay carrier tailnum
+## 1 2013    12  15     2124        -4     2322         1      UA  N801UA
+## 2 2013     7  17      651        -9      936       -28      DL  N194DN
+## 3 2013     3   2     1636         1     1800         0      WN  N475WN
+## 4 2013     8  19     1058        -2     1203       -32      WN  N765SW
+## 5 2013     9   9     1251        -9     1412         3      US  N963UW
+## 6 2013     1  18     1259        -1     1556       -14      WN  N654SW
+##   flight origin dest air_time distance hour minute gain    speed
+## 1    289    EWR  DTW       88      488   21     24    5 332.7273
+## 2    763    JFK  LAX      306     2475    6     51  -19 485.2941
+## 3   1501    LGA  MKE      103      738   16     36   -1 429.9029
+## 4     51    LGA  MDW      107      725   10     58  -30 406.5421
+## 5   2148    LGA  BOS       38      184   12     51   12 290.5263
+## 6   2239    EWR  HOU      222     1411   12     59  -13 381.3514
+```
+
+Note that `mutate()` of SparkR cannot accept multiple input at once.  
+Furthermore, `mutate()` of SparkR cannot also reuse columns added like below.
+
+
+```r
+df %>% mutate(gain = arr_delay - dep_delay, gain_per_hour = gain/(air_time/60)) %>% head
+```
+
+```
+##   year month day dep_time dep_delay arr_time arr_delay carrier tailnum
+## 1 2013    12  15     2124        -4     2322         1      UA  N801UA
+## 2 2013     7  17      651        -9      936       -28      DL  N194DN
+## 3 2013     3   2     1636         1     1800         0      WN  N475WN
+## 4 2013     8  19     1058        -2     1203       -32      WN  N765SW
+## 5 2013     9   9     1251        -9     1412         3      US  N963UW
+## 6 2013     1  18     1259        -1     1556       -14      WN  N654SW
+##   flight origin dest air_time distance hour minute gain gain_per_hour
+## 1    289    EWR  DTW       88      488   21     24    5     3.4090909
+## 2    763    JFK  LAX      306     2475    6     51  -19    -3.7254902
+## 3   1501    LGA  MKE      103      738   16     36   -1    -0.5825243
+## 4     51    LGA  MDW      107      725   10     58  -30   -16.8224299
+## 5   2148    LGA  BOS       38      184   12     51   12    18.9473684
+## 6   2239    EWR  HOU      222     1411   12     59  -13    -3.5135135
+```
+
+### 3-4. `arrange()`
+
+`arrange()` is used to sort rows by columns specified.
+
+
+```r
+df %>% arrange(month, day) %>% head
+```
+
+```
+##   year month day dep_time dep_delay arr_time arr_delay carrier tailnum
+## 1 2013     1   1     1353        -4     1549        24      EV  N14105
+## 2 2013     1   1     1832         4     2144         0      UA  N18220
+## 3 2013     1   1      602        -3      821        16      MQ  N730MQ
+## 4 2013     1   1     1416         5     1603        14      UA  N456UA
+## 5 2013     1   1     1127        -2     1303        -6      EV  N14180
+## 6 2013     1   1     2323        83       22        69      EV  N13538
+##   flight origin dest air_time distance hour minute
+## 1   4171    EWR  MSN      152      799   13     53
+## 2   1075    EWR  SNA      342     2434   18     32
+## 3   4401    LGA  DTW      105      502    6      2
+## 4    683    EWR  ORD      136      719   14     16
+## 5   4294    EWR  RDU       73      416   11     27
+## 6   4257    EWR  BTV       44      266   23     23
+```
+
+It will be sorted in ascending order if you write just column names.  
+If you want to sort in descending order, you can use `desc()`.
+
+
+```r
+df %>% arrange(month, desc(day)) %>% head
+```
+
+```
+##   year month day dep_time dep_delay arr_time arr_delay carrier tailnum
+## 1 2013     1  31     1424        -5     1752        -2      UA  N512UA
+## 2 2013     1  31     1853        -2     2149         7      DL  N175DZ
+## 3 2013     1  31      958        -2     1251       -30      UA  N464UA
+## 4 2013     1  31     1448       105     1635       131      B6  N292JB
+## 5 2013     1  31       NA       NaN       NA       NaN      US        
+## 6 2013     1  31     1358        -7     1717        12      B6  N554JB
+##   flight origin dest air_time distance hour minute
+## 1    257    JFK  SFO      355     2586   14     24
+## 2    951    JFK  ATL      129      760   18     53
+## 3    499    EWR  SEA      324     2402    9     58
+## 4     32    JFK  ROC       54      264   14     48
+## 5   1625    LGA  CLT      NaN      544  NaN    NaN
+## 6     63    JFK  TPA      164     1005   13     58
+```
+
+You can also sort by values that are transformed from columns.
+
+```{R}
+df %>% arrange(abs(dep_delay)) %>% head
+```
+
+### 3-5. `summarize()`
+
+`summarize()` is used to collapse a DataFrame to a single row.
+
+
+```r
+df %>% summarize(count = n(year)) %>% collect
+```
+
+```
+##   count
+## 1 10000
+```
+
+Typically, `summarize()` is used with `group_by()` to collapse each group to a single row.
+
+As far as I know, you can use the following functions in `summarize()`.
+
+- `n()`
+- `n_distinct()`
+- `approxCountDistinct()`
+- `mean()`
+- `first()`
+- `last()`
+
+It seems that other aggregate functions are available in Scala (See [docs](http://spark.apache.org/docs/1.4.0/api/scala/index.html#org.apache.spark.sql.functions$)).
+
+Like dplyr, you can use `summarise()` instead of `simmarize()`.
+
+### 3-6. `group_by()`
+
+`group_by()` is used to describe how to break a DataFrame down into groups of rows.
+Usually it is used with `summarize()` to collapse each group to a single row.
+
+
+```r
+df %>% 
+  group_by(tailnum) %>%
+  summarize(mean_distance = mean(distance)) %>% 
+  head
+```
+
+```
+##   tailnum mean_distance
+## 1  N600LR         695.0
+## 2  N3HAAA        1075.0
+## 3  N77518         642.5
+## 4  N66051        1400.0
+## 5  N5DCAA        1089.0
+## 6  N947DL        1016.5
+```
+
+You can indicate multiple colmuns.
+
+
+```r
+df %>% 
+  group_by(year, month, day) %>%
+  summarize(count = n(year)) %>% 
+  arrange(year, month, day) %>%
+  head
+```
+
+```
+##   year month day count
+## 1 2013     1   1    25
+## 2 2013     1   2    29
+## 3 2013     1   3    24
+## 4 2013     1   4    30
+## 5 2013     1   5    16
+## 6 2013     1   6    35
+```
+
+Unlike dplyr, only `summarize()` can receive the results of `group_by()`.
+
+## 4. How to use
+
