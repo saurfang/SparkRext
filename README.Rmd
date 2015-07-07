@@ -298,7 +298,7 @@ result <- df %>%
   select(year:day, flight, distance) %>%
   group_by(year, month, day) %>%
   summarize(flight_mean = mean(flight), distance_mean = mean(distance)) %>%
-  filter(flight_mean >= 2000, distance_mean >= 1000)
+  filter(flight_mean >= 2000, distance_mean >= 1000) %>%
   arrange(year, month, day) %>%
   collect
 
@@ -392,6 +392,6 @@ microbenchmark(
 
 If you want to use pipe operator on the others, please overwrite it.
 
-### 6. BugReports
+### 6. Bug reports
 
 - https://github.com/hoxo-m/SparkRext/issues
