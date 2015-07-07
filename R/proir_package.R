@@ -20,8 +20,9 @@ unload_package_ <- function(pkg_name) {
       detach(paste0("package:", pkg_name), character.only = TRUE)
       break
     }, error = function(e) {
-      required_package <- stringr::str_match(e$message, pattern = "required by ‘(.+?)’")[1, 2]
-      required_packages <- unload_package(required_package)
+      required_package <- stringr::str_match(e$message, pattern = "required by ([\\S]+)")[1, 2]
+      required_package <- stringr::str_sub(required_package, start = 2, end = -2)
+      required_packages <- unload_package_(required_package)
       result_packages <<- c(result_packages, required_packages)
     })
   }
@@ -31,7 +32,7 @@ unload_package_ <- function(pkg_name) {
 #' @export
 prior_library <- function(pkg_name) {
   pkg_name <- as.character(substitute(pkg_name))
-  prior_package_(pkg_name)
+  prior_library_(pkg_name)
 }
 
 #' @export
@@ -45,9 +46,3 @@ prior_library_ <- function(pkg_name) {
     suppressPackageStartupMessages(library(pkg_name, character.only = TRUE))
   }
 }
-
-#' @export
-prior_package <- prior_library
-
-#' @export
-prior_package_ <- prior_library_
