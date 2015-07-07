@@ -1,3 +1,4 @@
+library(SparkRext)
 sc <- sparkR.init(master="local")
 sqlContext <- sparkRSQL.init(sc)
 
@@ -14,7 +15,7 @@ set.seed(123)
 data <- sample_n(flights, 10000)
 df <- createDataFrame(sqlContext, data.frame(data))
 
-prior_package(SparkRext)
+prior_library(SparkRext)
 
 context("filter")
 
@@ -242,4 +243,20 @@ test_that("with pipe", {
     summarize(size=n(distance)) %>% head
   expect_equal(result$tailnum, c("N600LR", "N3HAAA", "N77518", "N66051", "N5DCAA", "N947DL"))
   expect_equal(result$size, c(5, 2, 2, 1, 1, 2))
+})
+
+context("combination")
+
+test_that("combination", {
+  result <- df %>%
+    select(year:day, flight, distance) %>%
+    group_by(year, month, day) %>%
+    summarize(flight_mean = SparkR::mean(flight), distance_mean = SparkR::mean(distance)) %>%
+    filter(flight_mean >= 2000, distance_mean >= 1000) %>%
+    arrange(year, month, day) %>%
+    head
+  
+  expect_equal(result$year, c(2013, 2013, 2013, 2013, 2013, 2013))
+  expect_equal(result$month, c(1, 1, 2, 3, 3, 3))
+  expect_equal(result$day, c(13, 24, 25, 5, 8, 9))
 })

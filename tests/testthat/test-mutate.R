@@ -16,7 +16,7 @@
 # data <- sample_n(flights, 10000)
 # df <- createDataFrame(sqlContext, data.frame(data))
 # 
-# prior_package(SparkRext)
+# prior_library(SparkRext)
 # 
 # test_that("add one column", {
 #   result <- mutate(df, gain = arr_delay - dep_delay)

@@ -16,7 +16,7 @@
 #   message("OK.")
 # })
 # 
-# prior_package(SparkRext)
+# prior_library(SparkRext)
 # 
 # test_that("one column", {
 #   result <- select(df, year)
