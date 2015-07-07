@@ -2,10 +2,12 @@ Package: SparkRext
 Type: Package
 Title: SparkR extension for closer to dplyr
 Version: 0.1.0
-Date: 2015-07-03
+Date: 2015-07-07
 Author: Koji MAKIYAMA (@hoxo_m)
 Maintainer: Koji MAKIYAMA <hoxo.smile@gmail.com>
-Description: SparkR extension for closer to the feeling of dplyr.
+URL: https://github.com/hoxo-m/SparkRext
+BugReports: https://github.com/hoxo-m/SparkRext/issues
+Description: SparkR extension for closer to dplyr.
 Suggests:
   nycflights13,
   testthat
@@ -14,4 +16,4 @@ Imports:
   lazyeval,
   pipeR,
   stringr
-License: MIT
+License: MIT + file LICENSE
