@@ -18,15 +18,13 @@ One of the reasons is that SparkR DataFrames present an API similar to **dplyr**
 For example:
 
 
-
-
 ```r
 df <- createDataFrame(sqlContext, iris)
 df %>%
   select("Sepal_Length", "Species") %>%
   filter(df$Sepal_Length >= 5.5) %>%
   group_by(df$Species) %>%
-  summarize(count=n(df$Sepal_Length), mean=mean(df$Sepal_Length)) %>%
+  summarize(count = n(df$Sepal_Length), mean = mean(df$Sepal_Length)) %>%
   collect  
 ```
 
@@ -75,7 +73,7 @@ df %>%
   select(Sepal_Length, Species) %>%
   filter(Sepal_Length >= 5.5) %>%
   group_by(Species) %>%
-  summarize(count=n(Sepal_Length), mean=mean(Sepal_Length)) %>%
+  summarize(count = n(Sepal_Length), mean = mean(Sepal_Length)) %>%
   collect  
 ```
 
@@ -100,7 +98,7 @@ You can install the package from there.
 
 ```r
 install.packages("devtools") # if you have not installed "devtools" package
-devtools::install_github("hoxo-m/dplyrr")
+devtools::install_github("hoxo-m/SparkRext")
 ```
 
 ## 3. Functions
@@ -518,81 +516,60 @@ When you can load SparkR package, you will be also able to use SparkRext package
 
 
 ```r
-# Load SparkRext
+# Preparation of data
+library(dplyr)
+library(nycflights13)
+set.seed(123)
+data <- sample_n(flights, 10000)
+
+# Load library
 library(SparkRext)
-prior_library(SparkRext)
 
 # Create Spark context and SQL context
 sc <- sparkR.init(master="local")
 sqlContext <- sparkRSQL.init(sc)
 
-# Preparation of data
-prior_library(dplyr)
-library(nycflights13)
-
-set.seed(123)
-data <- sample_n(flights, 10000)
-
 # Create DataFrame
-prior_library(SparkRext)
 df <- createDataFrame(sqlContext, data.frame(data))
+
+# Forcing to use the functions of SparkRext
+prior_library(SparkRext)
 
 # Play with DataFrame
 result <- df %>%
-  filter(month == 12, day == 31) %>%
-  mutate(gain = arr_delay - dep_delay, 
-         gain_per_hour = gain/(air_time/60)) %>%
-  select(tailnum, distance, gain_per_hour) %>%
-  group_by(tailnum) %>%
-  summarize(count = n(tailnum), 
-            mean_distance = mean(distance), 
-            mean_gain_per_hour = mean(gain_per_hour)) %>%
+  select(year:day, flight, distance) %>%
+  group_by(year, month, day) %>%
+  summarize(flight_mean = mean(flight), distance_mean = mean(distance)) %>%
+  filter(flight_mean >= 2000, distance_mean >= 1000)
+  arrange(year, month, day) %>%
   collect
 
-print(result)
+# Print result
+head(result)
 ```
 
 
 ```
-##    tailnum count mean_distance mean_gain_per_hour
-## 1   N299PQ     1           301         -0.8571429
-## 2   N903XJ     1          1391         -6.6666667
-## 3   N15555     1           266        -21.8181818
-## 4   N588JB     1           264         -8.8888889
-## 5   N651JB     1          1608          1.5151515
-## 6   N715JB     1           944          1.2162162
-## 7   N138EV     1           269        -42.0000000
-## 8   N37281     1          2565         -0.3183024
-## 9   N17730     1          1634         -4.7524752
-## 10  N630VA     1          2475          0.3314917
-## 11  N501MQ     2           348         -4.7842402
-## 12  N292JB     1           301         10.6451613
-## 13  N630JB     1           944         -0.3870968
-## 14  N403UA     1          1065         -8.4076433
-## 15  N355JB     1           266          7.3469388
-## 16  N911FJ     1           544        -10.4854369
-## 17  N66808     1          2565          0.3287671
-## 18  N374DA     1          2454          2.3268698
-## 19  N295PQ     1           765         -0.4511278
-## 20  N214FR     1          1620          6.9402985
-## 21  N599JB     1          1076          7.8750000
-## 22  N334JB     1           301          3.8095238
-## 23  N834JB     1          2586         -0.3234501
-## 24  N655MQ     1           425         -2.0454545
-## 25  N216JB     1           209         -7.2000000
-## 26  N17719     1          1023         -5.4901961
+##   year month day flight_mean distance_mean
+## 1 2013     1  13    2271.043      1025.261
+## 2 2013     1  24    2331.600      1092.850
+## 3 2013     2  25    2055.471      1074.529
+## 4 2013     3   5    2003.000      1003.448
+## 5 2013     3   8    2167.138      1048.448
+## 6 2013     3   9    2023.280      1168.400
 ```
 
 ## 5. Caution points
 
 ### 5-1. `prior_library()`
 
-SparkRext is sensitive to the order of loading of libraries.  
-Thus, you should use `prior_library()` after `library()`.
+SparkRext has the functions with the same name as the functions of SparkR.  
+Therefore, SparkRext is sensitive to the order of loading of libraries.  
+
+In order to avoid confusion, there is `prior_library()` function.
 
 
 ```r
-library(SparkRext)
 prior_library(SparkRext)
 ```
 
@@ -676,8 +653,12 @@ microbenchmark(
 ```
 ## Unit: milliseconds
 ##          expr      min       lq     mean   median       uq      max neval
-##  dplyr_pipe() 2.068075 2.245922 2.394440 2.286836 2.430241 3.846421   100
-##  pipeR_pipe() 1.803371 2.026255 2.182761 2.098782 2.190771 3.809419   100
+##  dplyr_pipe() 2.084006 2.243104 2.425786 2.315232 2.434530 3.972770   100
+##  pipeR_pipe() 1.827246 2.058515 2.173975 2.113719 2.179361 3.506113   100
 ```
 
 If you want to use pipe operator on the others, please overwrite it.
+
+### 6. BugReports
+
+- https://github.com/hoxo-m/SparkRext/issues
