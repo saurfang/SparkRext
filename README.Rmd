@@ -179,7 +179,7 @@ All select utility functions is below.
 - `one_of(...)`
 - `everything()`
 
-Note that select() of SparkR cannot accept a variety of input like this.
+Note that `select()` of SparkR cannot accept a variety of input like this.
 
 ### 3-3. `mutate()`
 
