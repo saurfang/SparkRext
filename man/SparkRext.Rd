@@ -4,8 +4,8 @@
 \name{SparkRext}
 \alias{SparkRext}
 \alias{SparkRext-package}
-\title{SparkR extension}
+\title{SparkR extension for closer to dplyr}
 \description{
-SparkR extension
+SparkR extension for closer to dplyr
 }
 

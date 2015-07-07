@@ -11,7 +11,7 @@ Description: SparkR extension for closer to dplyr.
 Suggests:
   nycflights13,
   testthat
-Imports: 
+Imports:
   dplyr,
   lazyeval,
   pipeR,
