@@ -511,6 +511,7 @@ To install SparkR 1.4.0, the next articles may be useful.
 
 - [How to use SparkR within Rstudio?](http://www.r-bloggers.com/how-to-use-sparkr-within-rstudio/)
 - [SparkR with Rstudio in Ubuntu 12.04](http://www.r-bloggers.com/sparkr-with-rstudio-in-ubuntu-12-04/)
+- [Installing and Starting SparkR Locally on Windows OS and RStudio](http://blog.danielemaasit.com/2015/07/26/installing-and-starting-sparkr-locally-on-windows-8-1-and-rstudio/)
 
 When you can load SparkR package, you will be also able to use SparkRext package.
 
@@ -657,8 +658,10 @@ microbenchmark(
 ##  pipeR_pipe() 1.827246 2.058515 2.173975 2.113719 2.179361 3.506113   100
 ```
 
-If you want to use pipe operator on the others, please overwrite it.
+If you want to use pipe operator on the others, please override it.
 
-### 6. Bug reports
+## 6. Bug reports
 
 - https://github.com/hoxo-m/SparkRext/issues
+
+<br />
