@@ -14,6 +14,5 @@ Suggests:
 Imports:
   dplyr,
   lazyeval,
-  pipeR,
   stringr
 License: MIT + file LICENSE
