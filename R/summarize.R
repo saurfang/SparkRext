@@ -1,42 +1,28 @@
 #' @export
-summarize <- function(.data, ..., .dots = lazyeval::lazy_dots(...)) {
-  UseMethod("summarize")
+summarize <- dplyr::summarize
+
+#' @export
+summarise_.DataFrame <- function(.data, ..., .dots) {
+  summarise_(group_by(.data), ..., .dots = .dots)
 }
 
 #' @export
-summarise <- summarize
-
-#' @export
-summarize.DataFrame <- function(.data, ..., .dots = lazyeval::lazy_dots(...)) {
-  dfname <- as.character(substitute(.data))
-  columns <- SparkR::columns(.data)
-  if(length(.dots) == 0) return(SparkR::summarize(.data))
+summarise_.SparkGroupedData <- function(.data, ..., .dots) {
+  .dots <- lazyeval::all_dots(.dots, ..., all_named = TRUE)
   
-  get_input <- function(lazy) to_spark_input(lazy, dfname, columns)
+  if (length(.dots) == 0) return(SparkR::summarize(.data$grouped_data))
   
-  inputs <- Map(get_input, .dots)
-  
-  args <- c(list(x=.data), inputs)
-  
-  do.call(SparkR::summarize, args)
-}
-
-#' @export
-summarize.SparkGroupedData <- function(.data, ..., .dots = lazyeval::lazy_dots(...)) {
   df <- .data$DataFrame
-  columns <- SparkR::columns(df)
   .data <- .data$grouped_data
-
-  if(length(.dots) == 0) return(SparkR::summarize(.data))
   
   get_input <- function(lazy) {
-    assign(".dummy_data_frame", value = df, envir = lazy$env)
-    to_spark_input(lazy, ".dummy_data_frame", columns)
+    to_spark_input(lazy, df)
   }
   
   inputs <- Map(get_input, .dots)
   
-  args <- c(list(x=.data), inputs)
+  # supress is.na check warning
+  args <- suppressWarnings(c(x = .data, inputs))
   
   do.call(SparkR::summarize, args)
 }

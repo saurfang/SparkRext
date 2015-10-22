@@ -1,17 +1,15 @@
-to_spark_input <- function(lazy, dfname, columns) {
-  expr <- lazy$expr
-  envir <- lazy$env
-  spark_expr <- translate_spark_columns(expr, dfname, columns)
-  eval(spark_expr, envir = envir)
+to_spark_input <- function(lazy, df, columns = SparkR::columns(df)) {
+  spark_expr <- translate_spark_columns(lazy$expr, df, columns)
+  eval(spark_expr, envir = lazy$env)
 }
 
-translate_spark_columns <- function(call, dfname, columns) {
+translate_spark_columns <- function(call, df, columns) {
   if(is.atomic(call)) return(call)
   
   if(is.symbol(call)) {
     name <- as.character(call)
     if(name %in% columns) {
-      parse(text = sprintf("%s$%s", dfname, name))[[1]]
+      do.call(`$`, list(df, name))
     } else {
       call
     }
@@ -20,7 +18,7 @@ translate_spark_columns <- function(call, dfname, columns) {
     if(name %in% c("$", "[[", "[")) {
       call
     } else {
-      call[-1] <- lapply(call[-1], translate_spark_columns, dfname, columns)
+      call[-1] <- lapply(call[-1], translate_spark_columns, df, columns)
       call
     }
   }

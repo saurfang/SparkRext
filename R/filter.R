@@ -1,11 +1,13 @@
 #' @export
-filter <- function(.data, ..., .dots = lazyeval::lazy_dots(...)) {
-  dfname <- as.character(substitute(.data))
-  columns <- SparkR::columns(.data)
+filter <- dplyr::filter
+
+#' @export
+filter_.DataFrame <- function(.data, ..., .dots) {
+  .dots <- lazyeval::all_dots(.dots, ..., all_named = TRUE)
   
-  if(length(.dots) == 0) return(SparkR::filter(.data))
+  if (length(.dots) == 0) return(.data)
   
-  get_conditions <- function(lazy) to_spark_input(lazy, dfname, columns)
+  get_conditions <- function(lazy) to_spark_input(lazy, .data)
   
   conditions <- Map(get_conditions, .dots)
   

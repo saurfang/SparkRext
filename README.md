@@ -28,13 +28,6 @@ df %>%
   collect  
 ```
 
-```
-##      Species count     mean
-## 1 versicolor    44 6.050000
-## 2     setosa     5 5.640000
-## 3  virginica    49 6.622449
-```
-
 This is very cool. But I have a little discontent.
 
 One of the reasons that dplyr is so much popular is the functions adopts NSE(non-standard evaluation).
@@ -53,6 +46,7 @@ iris %>%
 ## Source: local data frame [3 x 3]
 ## 
 ##      Species count     mean
+##       (fctr) (int)    (dbl)
 ## 1     setosa     5 5.640000
 ## 2 versicolor    44 6.050000
 ## 3  virginica    49 6.622449
@@ -186,14 +180,14 @@ df %>% filter(month == 12 | day == 31) %>% head
 ## 3 2013    12  16     1248        -4     1407        -4      EV  N11548
 ## 4 2013    12  27      928        28     1307        48      DL  N901DE
 ## 5 2013    12   7     1719       -10     2008         8      F9  N209FR
-## 6 2013    12  10       NA       NaN       NA       NaN      EV  N717EV
+## 6 2013    12  10       NA        NA       NA        NA      EV  N717EV
 ##   flight origin dest air_time distance hour minute
 ## 1    289    EWR  DTW       88      488   21     24
 ## 2   2065    JFK  FLL      173     1069   20     31
 ## 3   6054    EWR  IAD       49      212   12     48
 ## 4   2446    LGA  FLL      186     1076    9     28
 ## 5    507    LGA  DEN      269     1620   17     19
-## 6   5245    LGA  PIT      NaN      335  NaN    NaN
+## 6   5245    LGA  PIT       NA      335   NA     NA
 ```
 
 Note that `filter()` of SparkR cannot accept multiple conditions at once.
@@ -395,14 +389,14 @@ df %>% arrange(month, desc(day)) %>% head
 ## 2 2013     1  31     1853        -2     2149         7      DL  N175DZ
 ## 3 2013     1  31      958        -2     1251       -30      UA  N464UA
 ## 4 2013     1  31     1448       105     1635       131      B6  N292JB
-## 5 2013     1  31       NA       NaN       NA       NaN      US        
+## 5 2013     1  31       NA        NA       NA        NA      US        
 ## 6 2013     1  31     1358        -7     1717        12      B6  N554JB
 ##   flight origin dest air_time distance hour minute
 ## 1    257    JFK  SFO      355     2586   14     24
 ## 2    951    JFK  ATL      129      760   18     53
 ## 3    499    EWR  SEA      324     2402    9     58
 ## 4     32    JFK  ROC       54      264   14     48
-## 5   1625    LGA  CLT      NaN      544  NaN    NaN
+## 5   1625    LGA  CLT       NA      544   NA     NA
 ## 6     63    JFK  TPA      164     1005   13     58
 ```
 
@@ -415,19 +409,19 @@ df %>% arrange(abs(dep_delay)) %>% head
 
 ```
 ##   year month day dep_time dep_delay arr_time arr_delay carrier tailnum
-## 1 2013     2  18      605         0      844       -23      B6  N629JB
-## 2 2013     8  22      640         0      935        11      UA  N36207
-## 3 2013     3  13     1738         0     2002        -2      FL  N944AT
-## 4 2013     3   5     1840         0     2142       -23      DL  N3772H
-## 5 2013    10   4     1710         0     1821       -14      MQ  N724MQ
-## 6 2013     2  19     2130         0     2255         0      B6  N228JB
+## 1 2013     1  28       NA        NA       NA        NA      EV  N13969
+## 2 2013     2   9       NA        NA       NA        NA      UA        
+## 3 2013     1  25       NA        NA       NA        NA      US        
+## 4 2013    12  10       NA        NA       NA        NA      EV  N717EV
+## 5 2013    11  26       NA        NA       NA        NA      EV  N755EV
+## 6 2013     7   1       NA        NA       NA        NA      MQ  N711MQ
 ##   flight origin dest air_time distance hour minute
-## 1    501    JFK  FLL      138     1069    6      5
-## 2   1162    EWR  TPA      138      997    6     40
-## 3    806    LGA  ATL      113      762   17     38
-## 4   1643    JFK  SEA      343     2422   18     40
-## 5   3365    JFK  DCA       43      213   17     10
-## 6    104    JFK  BUF       60      301   21     30
+## 1   4588    EWR  MHT       NA      209   NA     NA
+## 2   1274    EWR  SJU       NA     1608   NA     NA
+## 3   2138    LGA  BOS       NA      184   NA     NA
+## 4   5245    LGA  PIT       NA      335   NA     NA
+## 5   5048    LGA  RIC       NA      292   NA     NA
+## 6   3388    LGA  CMH       NA      479   NA     NA
 ```
 
 ### 3-5. `summarize()`
@@ -474,12 +468,12 @@ df %>%
 
 ```
 ##   tailnum mean_distance
-## 1  N600LR         695.0
-## 2  N3HAAA        1075.0
-## 3  N77518         642.5
-## 4  N66051        1400.0
-## 5  N5DCAA        1089.0
-## 6  N947DL        1016.5
+## 1  N8580A      245.6667
+## 2  N554JB     1274.5000
+## 3  N600LR      695.0000
+## 4  N3HAAA     1075.0000
+## 5  N871AS      617.0000
+## 6  N77518      642.5000
 ```
 
 You can indicate multiple colmuns.
@@ -613,52 +607,51 @@ head(search())
 ## [4] "package:SparkRext"    "package:nycflights13" "package:stats"
 ```
 
-### 5-2. Pipe operator `%>%`
-
-You can use pipe operator `%>%` without loading magrittr or dplyr.  
-The pipe operator imports from **pipeR** package. (See [pipeR](http://renkun.me/pipeR/))
-
-The reason of it is that the pipe operator of pipeR is faster than magrittr.  
-I will show that below.
 
 
+### 5-2. Interoperability betwen SparkR and dplyr
 
+The appeal of SparkR is operating a large scale dataset with familiar R syntax.
+However it would be a shame if we limit ourselves into relying on SparkR for all data manipulation.
+For example, R visualization is very powerful and easy to use. You might want to produce a medium size aggregated local data.frame using SparkR and proceed further slice and dice during charting.
+
+For example, we can look average departure delay in a few different dimensions
 
 ```r
-library(dplyr)
-library(pipeR)
-library(microbenchmark)
+library(ggplot2)
 
-dplyr_pipe <- function() {
-  iris %>%
-    select(Sepal.Length, Species) %>%
-    filter(Sepal.Length >= 5.5) %>%
-    group_by(Species) %>%
-    summarize(count = n(), mean = mean(Sepal.Length))
-}
+aggDF <- df %>%
+  group_by(year, month, carrier, origin, dest) %>%
+  summarise(n = n(dep_delay), dep_delay = mean(dep_delay)) %>%
+  collect()
 
-pipeR_pipe <- function() {
-  iris %>>%
-    select(Sepal.Length, Species) %>>%
-    filter(Sepal.Length >= 5.5) %>>%
-    group_by(Species) %>>%
-    summarize(count = n(), mean = mean(Sepal.Length))
-}
-
-microbenchmark(
-  dplyr_pipe(),
-  pipeR_pipe()
-)
+aggDF %>%
+  group_by(period = as.Date(paste0(year, "-", month, "-01")), carrier) %>%
+  summarise(total = n(), dep_delay = weighted.mean(dep_delay, n)) %>%
+  # keep period/carrier with more than 20 observations
+  filter(total > 20) %>%
+  ggplot(aes(period, dep_delay, color = carrier)) +
+  geom_line() +
+  theme_bw()
 ```
 
-```
-## Unit: milliseconds
-##          expr      min       lq     mean   median       uq      max neval
-##  dplyr_pipe() 2.084006 2.243104 2.425786 2.315232 2.434530 3.972770   100
-##  pipeR_pipe() 1.827246 2.058515 2.173975 2.113719 2.179361 3.506113   100
+![](README_files/figure-html/unnamed-chunk-32-1.png) 
+
+```r
+aggDF %>%
+  group_by(origin, dest) %>%
+  summarise(total = n(), dep_delay = weighted.mean(dep_delay, n)) %>%
+  filter(total > 30) %>%
+  ggplot(aes(origin, dest, fill = dep_delay)) +
+  geom_tile(colour = "white") +
+  scale_fill_gradient(low = "white", high = "steelblue")
 ```
 
-If you want to use pipe operator on the others, please override it.
+![](README_files/figure-html/unnamed-chunk-32-2.png) 
+
+As you can see, the seamless transition from large dataframe to small dataframe can be very powerful.
+Data science is a not big data or small data endeavor. Having the same set of functions that allow us 
+handle both end of the spectrum in the same project can deliver an really enjoyable experience.
 
 ## 6. Bug reports
 

@@ -1,14 +1,17 @@
 #' @export
-arrange <- function(.data, ..., .dots = lazyeval::lazy_dots(...)) {
-  dfname <- as.character(substitute(.data))
-  columns <- SparkR::columns(.data)
-  if(length(.dots) == 0) return(SparkR::arrange(.data))
+arrange <- dplyr::arrange
+
+#' @export
+arrange_.DataFrame <- function(.data, ..., .dots) {
+  .dots <- lazyeval::all_dots(.dots, ..., all_named = TRUE)
   
-  get_input <- function(lazy) to_spark_input(lazy, dfname, columns)
+  if (length(.dots) == 0) return(.data)
+  
+  get_input <- function(lazy) to_spark_input(lazy, .data)
   
   inputs <- Map(get_input, .dots)
   
-  args <- c(list(x=.data), inputs)
+  args <- c(list(x = .data), unname(inputs))
   
   do.call(SparkR::arrange, args)
 }

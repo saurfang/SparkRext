@@ -10,7 +10,9 @@ BugReports: https://github.com/hoxo-m/SparkRext/issues
 Description: SparkR extension for closer to dplyr.
 Suggests:
   nycflights13,
-  testthat
+  testthat,
+  SparkR,
+  ggplot2
 Imports:
   dplyr,
   lazyeval,
