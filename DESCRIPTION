@@ -1,13 +1,16 @@
 Package: SparkRext
 Type: Package
-Title: SparkR extension for closer to dplyr
-Version: 0.1.1
-Date: 2015-07-29
-Author: Koji MAKIYAMA (@hoxo_m)
-Maintainer: Koji MAKIYAMA <hoxo.smile@gmail.com>
-URL: https://github.com/hoxo-m/SparkRext
-BugReports: https://github.com/hoxo-m/SparkRext/issues
-Description: SparkR extension for closer to dplyr.
+Title: SparkR extension for dplyr
+Description: This package reimplement data wrangling functions to override dplyr generics instead.
+This allows users to use same sets of functions for both Spark DataFrame and R DataFrame in the same session.
+Version: 0.2.0
+Date: 2015-10-28
+Author: c(
+    person("Koji", "MAKIYAME", , "hoxo.smile@gmail.com", c("aut", "cre")),
+    person("Forest", "Fang", , "forest.fang@outlook.com", role = "aut")
+    )
+URL: https://github.com/saurfang/SparkRext
+BugReports: https://github.com/saurfang/SparkRext/issues
 Suggests:
   nycflights13,
   testthat,

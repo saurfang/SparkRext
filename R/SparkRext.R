@@ -1,4 +1,4 @@
-#' SparkR extension for closer to dplyr
+#' SparkR extension for dplyr
 #' 
 #' @name SparkRext
 #' @docType package

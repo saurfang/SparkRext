@@ -1,5 +1,4 @@
-# SparkRext - SparkR extension for closer to dplyr
-Koji MAKIYAMA (@hoxo_m)  
+# SparkRext - SparkR extension for dplyr
 
 
 
@@ -7,7 +6,12 @@ Koji MAKIYAMA (@hoxo_m)
 
 
 
-## 1. Overview
+This is a fork of the excellent package [SparkRext](https://github.com/hoxo-m/SparkRext), by [@hoxo-m](https://github.com/hoxo-m), which enables users to use [dplyr](https://github.com/saurfang/dplyr) NSE style calls for all data wrangling functions. However it's still impossible to use these functions for distributed Spark DataFrame and local R DataFrame at the same time. This fork enables such use case as shown below.
+
+The motivation is that while SparkR provides a powerful interface to transform distributed DataFrame and practice machine learning algorithms, R still excels in small data world such as [data visualization](#interoperability-between-sparkr-and-dplyr), small data aggregation and etc. 
+
+
+## Overview
 
 [Apache Spark](https://spark.apache.org/) is one of the hottest products in data science.  
 Spark 1.4.0 has formally adopted **SparkR** package which enables to handle Spark DataFrames on R.(See [this article](http://databricks.com/blog/2015/06/09/announcing-sparkr-r-on-spark.html))
@@ -81,18 +85,14 @@ df %>%
 SparkRext redefines the functions of SparkR to enable NSE inputs.  
 As a result, the functions will be able to be used in the same way as dplyr.
 
-## 2. How to install
-
-The source code for SparkRext package is available on GitHub at
-
-- https://github.com/hoxo-m/SparkRext.
+## How to install
 
 You can install the package from there.
 
 
 ```r
 install.packages("devtools") # if you have not installed "devtools" package
-devtools::install_github("hoxo-m/SparkRext")
+devtools::install_github("saurfang/SparkRext")
 ```
 
 ## 3. Functions
@@ -106,6 +106,8 @@ SparkRext redefines six functions on SparkR.
 - `summarize()`
 - `group_by()`
 
+Note we only redefine the generic functions for Spark DataFrame so these functions can still be used with local data frame.
+
 In this section, these funcions are explained.
 
 For illustration, let’s prepare data.
@@ -114,12 +116,12 @@ For illustration, let’s prepare data.
 ```r
 library(dplyr)
 library(nycflights13)
+library(SparkR)
 
 set.seed(123)
 data <- sample_n(flights, 10000)
 
 library(SparkRext)
-prior_library(SparkRext)
 
 df <- createDataFrame(sqlContext, data.frame(data))
 df %>% head
@@ -142,7 +144,7 @@ df %>% head
 ## 6   2239    EWR  HOU      222     1411   12     59
 ```
 
-### 3-1. `filter()`
+### `filter()`
 
 `filter()` is used to extract rows that the conditions specified are satisfied.
 
@@ -192,7 +194,7 @@ df %>% filter(month == 12 | day == 31) %>% head
 
 Note that `filter()` of SparkR cannot accept multiple conditions at once.
 
-### 3-2. `select()`
+### `select()`
 
 `select()` is used to extract columns specified.
 
@@ -298,7 +300,7 @@ All select utility functions is below.
 
 Note that `select()` of SparkR cannot accept a variety of input like this.
 
-### 3-3. `mutate()`
+### `mutate()`
 
 `mutate()` is used to add new columns.
 
@@ -349,7 +351,7 @@ df %>% mutate(gain = arr_delay - dep_delay, gain_per_hour = gain/(air_time/60)) 
 ## 6   2239    EWR  HOU      222     1411   12     59  -13    -3.5135135
 ```
 
-### 3-4. `arrange()`
+### `arrange()`
 
 `arrange()` is used to sort rows by columns specified.
 
@@ -424,7 +426,7 @@ df %>% arrange(abs(dep_delay)) %>% head
 ## 6   3388    LGA  CMH       NA      479   NA     NA
 ```
 
-### 3-5. `summarize()`
+### `summarize()`
 
 `summarize()` is used to collapse a DataFrame to a single row.
 
@@ -453,7 +455,7 @@ It seems that other aggregate functions are available in Scala (See [docs](http:
 
 Like dplyr, you can use `summarise()` instead of `simmarize()`.
 
-### 3-6. `group_by()`
+### `group_by()`
 
 `group_by()` is used to describe how to break a DataFrame down into groups of rows.  
 Usually it is used with `summarize()` to collapse each group to a single row.
@@ -499,7 +501,7 @@ df %>%
 
 Unlike dplyr, only `summarize()` can receive the results of `group_by()`.
 
-## 4. How to use
+## How to use
 
 To install SparkR 1.4.0, the next articles may be useful.
 
@@ -518,6 +520,7 @@ set.seed(123)
 data <- sample_n(flights, 10000)
 
 # Load library
+library(SparkR)
 library(SparkRext)
 
 # Create Spark context and SQL context
@@ -526,9 +529,6 @@ sqlContext <- sparkRSQL.init(sc)
 
 # Create DataFrame
 df <- createDataFrame(sqlContext, data.frame(data))
-
-# Forcing to use the functions of SparkRext
-prior_library(SparkRext)
 
 # Play with DataFrame
 result <- df %>%
@@ -554,62 +554,7 @@ head(result)
 ## 6 2013     3   9    2023.280      1168.400
 ```
 
-## 5. Caution points
-
-### 5-1. `prior_library()`
-
-SparkRext has the functions with the same name as the functions of SparkR.  
-Therefore, SparkRext is sensitive to the order of loading of libraries.  
-
-In order to avoid confusion, there is `prior_library()` function.
-
-
-```r
-prior_library(SparkRext)
-```
-
-By doing this, the functions of SparkRext will be called with the highest priority.  
-You can confirm this by checking the search path:
-
-
-```r
-head(search())
-```
-
-```
-## [1] ".GlobalEnv"           "package:SparkRext"    "package:SparkR"      
-## [4] "package:nycflights13" "package:dplyr"        "package:stats"
-```
-
-If you want to switch to SparkR, you can do it.
-
-
-```r
-prior_library(SparkR)
-head(search())
-```
-
-```
-## [1] ".GlobalEnv"           "package:SparkR"       "package:SparkRext"   
-## [4] "package:nycflights13" "package:dplyr"        "package:stats"
-```
-
-You can also switch to dplyr.
-
-
-```r
-prior_library(dplyr)
-head(search())
-```
-
-```
-## [1] ".GlobalEnv"           "package:dplyr"        "package:SparkR"      
-## [4] "package:SparkRext"    "package:nycflights13" "package:stats"
-```
-
-
-
-### 5-2. Interoperability betwen SparkR and dplyr
+## Interoperability between SparkR and dplyr
 
 The appeal of SparkR is operating a large scale dataset with familiar R syntax.
 However it would be a shame if we limit ourselves into relying on SparkR for all data manipulation.
@@ -635,7 +580,7 @@ aggDF %>%
   theme_bw()
 ```
 
-![](README_files/figure-html/unnamed-chunk-32-1.png) 
+![](README_files/figure-html/unnamed-chunk-27-1.png) 
 
 ```r
 aggDF %>%
@@ -647,14 +592,8 @@ aggDF %>%
   scale_fill_gradient(low = "white", high = "steelblue")
 ```
 
-![](README_files/figure-html/unnamed-chunk-32-2.png) 
+![](README_files/figure-html/unnamed-chunk-27-2.png) 
 
 As you can see, the seamless transition from large dataframe to small dataframe can be very powerful.
 Data science is a not big data or small data endeavor. Having the same set of functions that allow us 
 handle both end of the spectrum in the same project can deliver an really enjoyable experience.
-
-## 6. Bug reports
-
-- https://github.com/hoxo-m/SparkRext/issues
-
-<br />
