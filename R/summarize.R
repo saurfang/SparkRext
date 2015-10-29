@@ -3,7 +3,7 @@ summarize <- dplyr::summarize
 
 #' @export
 summarise_.DataFrame <- function(.data, ..., .dots) {
-  summarise_(group_by(.data), ..., .dots = .dots)
+  summarise_.SparkGroupedData(group_by(.data), ..., .dots = .dots)
 }
 
 #' @export
