@@ -15,6 +15,5 @@ Suggests:
   ggplot2
 Imports:
   dplyr,
-  lazyeval,
-  stringr
+  lazyeval
 License: MIT + file LICENSE
