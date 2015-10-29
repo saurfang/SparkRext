@@ -15,7 +15,7 @@ translate_spark_columns <- function(call, df, columns) {
     }
   } else if(is.call(call)) {
     name <- as.character(call[[1]])
-    if(name %in% c("$", "[[", "[")) {
+    if(name[1] %in% c("$", "[[", "[")) {
       call
     } else {
       call[-1] <- lapply(call[-1], translate_spark_columns, df, columns)
